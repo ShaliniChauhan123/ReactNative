@@ -5,20 +5,55 @@
  * @format
  */
 
-import {NavigationContainer} from '@react-navigation/native';
 import React, {useState} from 'react';
-import {Platform, StyleSheet, useColorScheme} from 'react-native';
+import type {PropsWithChildren} from 'react';
+import {
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 import {useMutation} from 'react-query';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {LoginScreen} from './components/screens/LoginScreen';
-import {RegisterScreen} from './components/screens/RegisterScreen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import HomeScreen from './components/screens/HomeScreen';
 
-function App(): JSX.Element {
+type SectionProps = PropsWithChildren<{
+  title: string;
+}>;
+
+function Section({children, title}: SectionProps): JSX.Element {
+  const isDarkMode = useColorScheme() === 'dark';
+  return (
+    <View style={styles.sectionContainer}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          {
+            color: isDarkMode ? Colors.white : Colors.black,
+          },
+        ]}>
+        {title}
+      </Text>
+      <Text
+        style={[
+          styles.sectionDescription,
+          {
+            color: isDarkMode ? Colors.light : Colors.dark,
+          },
+        ]}>
+        {children}
+      </Text>
+    </View>
+  );
+}
+
+function HomeScreen(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -57,23 +92,49 @@ function App(): JSX.Element {
       return res;
     },
   );
-  const Stack = createNativeStackNavigator();
 
   const [inputVal, setInputVal] = useState('');
-  //const Stack = createStackNavigator();
-  const getToken = () => AsyncStorage.getItem('storage_token');
-  var token = getToken();
   return (
-    <NavigationContainer>
-      {token !== null ? (
-        <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="SignUp" component={RegisterScreen} />
-        </Stack.Navigator>
-      ) : (
-        <Stack.Screen name="Home" component={HomeScreen} />
-      )}
-    </NavigationContainer>
+    <View style={styles.MainContainer}>
+      <Section title="My Todo App" />
+      <TextInput
+        value={inputVal}
+        onChangeText={newText => setInputVal(newText)}
+        style={{
+          height: 40,
+          borderColor: 'gray',
+          borderWidth: 1,
+          width: '100%',
+          borderRadius: 50,
+          padding: 20,
+        }}
+        placeholder="Add your Todo..."></TextInput>
+
+      <View style={styles.bottomView}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('first', inputVal);
+            mutate({
+              description: inputVal,
+            });
+          }}
+          style={styles.touchableOpacityStyle}>
+          <Image
+            source={{
+              uri: 'https://raw.githubusercontent.com/AboutReact/sampleresource/master/plus_icon.png',
+            }}
+            style={styles.floatingButtonStyle}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView>
+        <Text>hhh</Text>
+        <Text>hhh</Text>
+        <Text>hhh</Text>
+        <Text>hhh</Text>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -128,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+export default HomeScreen;
